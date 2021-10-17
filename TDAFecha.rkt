@@ -11,7 +11,7 @@
 ;Dominio: enteros
 ;Recorrido: lista
 
-(define (fecha dia mes anio)
+(define (crearFecha dia mes anio)
   (if (and (integer? dia) (integer? mes) (integer? anio))
       (list dia mes anio)
       #f
@@ -26,7 +26,7 @@
 (define (esfecha? fecha)
   (if (and (and (>= (car fecha) 1) (<= (car fecha) 31))
            (and (>= (car (cdr fecha)) 1) (<= (car (cdr fecha)) 12))
-           (and ( not (= (car (cdr (cdr fecha))) 0)))
+           (and (>= (car (cdr (cdr fecha))) 0))
        )
       #t
       #f
@@ -76,32 +76,45 @@
 ;Rec= una lista
 
 (define (setDia fecha nuevoDia)
-  (if (esfecha? fecha)
-      (fecha nuevoDia (getMes fecha) (getAnio fecha))
-      null
-   )
-)
+  (if(esfecha? fecha)
+     (if (and (>= nuevoDia 1)
+              (<= nuevoDia 31)
+          )
+         (crearFecha nuevoDia (getMes fecha) (getAnio fecha))
+         fecha
+         )
+     null
+     )
+  )
 
 ;Funcion que crea una nueva fecha a partir de una fecha ingresada como argumento y reemplaza el valor del mes
 ;Dom= una lista y un entero
 ;Rec: una lista
 
 (define (setMes fecha nuevoMes)
-  (if (esfecha? fecha)
-      (fecha (getDia fecha) nuevoMes (getAnio fecha))
-      null
-   )
-)
+  (if(esfecha? fecha)
+     (if (and (>= nuevoMes 1)
+              (<= nuevoMes 12)
+          )
+         (crearFecha (getDia) nuevoMes (getAnio fecha))
+         fecha
+         )
+     null
+     )
+  )
 
 ;Funcion que crea una nueva fecha a partir de una fecha ingresada como argumento y reemplaza el valor del año
 ;Dom= una lista y un entero
 ;Rec: una lista
 
-(define (setAnio fecha nuevoAnio)
-  (if (esfecha? fecha)
-      (fecha (getDia fecha) (getMes fecha) nuevoAnio)
-      null
-   )
-)
+(define (setiAnio fecha nuevoAnio)
+  (if(esfecha? fecha)
+     (if (>= nuevoAnio 0)
+         (crearFecha (getDia fecha) (getMes fecha) nuevoAnio)
+         fecha
+         )
+     null
+     )
+  )
 
 (provide (all-defined-out))
