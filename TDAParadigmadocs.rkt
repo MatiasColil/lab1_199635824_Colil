@@ -2,19 +2,24 @@
 
 (require  "TDAFecha.rkt")
 
+(define encryptFn (lambda (s) (list->string (reverse (string->list s)))))
+(define decrypFn (lambda (s) (list->string (reverse (string->list s)))))
+
 ;TDA paradigmadocs
 ;este TDA representa la plataforma de documentos colaborativos
+;es una lista con los siguientes elementos
+;(nombre de la plataforma(string), fecha(entero) ,funcion(encrypt), funcion(decrypt), lista de usuarios, lista de documentos)
 
 ;CONSTRUCTOR
 ;Funcion que me crea la plataforma 
 ;Dom:
 ;Rec: una lista
 
-(define (crearPlataforma nombre fecha encrypFunction decrypFunction)
+(define (crearPlataforma nombre fecha encrypFn decrypFn)
   (if (string? nombre)
       (if (esfecha? fecha)
-          (list nombre fecha encrypFunction decrypFunction (list) (list) (list))
-          ;los tres ultimos elemenos de la lista corresponden a lo siguiente en este orden: lista de usuarios, lista de usuarios activos, lista de documentos
+          (list nombre fecha encrypFn decrypFn (list) (list))
+          ;los tres ultimos elemenos de la lista corresponden a lo siguiente en este orden: lista de usuarios,  lista de documentos
           #f
           )
       #f
@@ -58,6 +63,27 @@
       )
   )
 
+;Funcion que retorna la funcion encryp
+;Dom:
+;rec:
+
+(define (getEncryp plataforma)
+  (if (esPlataforma? plataforma)
+      (car (cdr(cdr plataforma)))
+      #f
+      )
+  )
+
+;Funcion que retorna la funcion decryp
+;Dom:
+;rec:
+
+(define (getDecryp plataforma)
+  (if (esPlataforma? plataforma)
+      (car (cdr(cdr (cdr plataforma))))
+      #f
+      )
+  )
 ;Funcion que retorna la lista de usuarios 
 ;Dom: lista
 ;Rec: lista
@@ -73,20 +99,20 @@
 ;Dom: lista
 ;Rec: lista
 
-(define (getUsuarios-activos plataforma)
+(define (getLista-documentos plataforma)
   (if (esPlataforma? plataforma)
       (car (cdr (cdr (cdr (cdr(cdr plataforma))))))
       #f
       )
   )
 
-;Funcion que retorna la lista de usuarios de activos
-;Dom: lista
-;Rec: lista
+;MODIFICADORES
 
-(define (getLista-documentos plataforma)
-  (if (esPlataforma? plataforma)
-      (car (cdr (cdr (cdr (cdr(cdr (cdr plataforma)))))))
-      #f
-      )
+
+;FUNCIONES EXTRAS
+
+(define (modificar-plataforma nombre fecha encrypFn decrypFn listaUsuarios listaDocs)
+  (list nombre fecha encrypFn decrypFn listaUsuarios listaDocs)
   )
+
+(provide (all-defined-out))
