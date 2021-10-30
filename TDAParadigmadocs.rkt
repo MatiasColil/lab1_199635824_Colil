@@ -108,6 +108,26 @@
 
 ;MODIFICADORES
 
+;Funcion que me retorna la plataforma con una nueva lista de documentos
+;Dom: plataforma X lista
+;Rec: plataforma
+(define (setLista-documentos plataforma nuevaLista-documentos)
+  (if (esPlataforma? plataforma)
+      ( list (getNombre plataforma) (getFecha plataforma) (getEncryp plataforma) (getDecryp plataforma) (getLista-usuarios plataforma) nuevaLista-documentos)
+      plataforma
+      )
+  )
+
+;Funcion que me retorna la plataforma con una nueva lista de usuarios
+;Dom: plataforma X lista
+;Rec: plataforma
+(define (setLista-usuarios plataforma nuevaLista-usuarios)
+  (if (esPlataforma? plataforma)
+      (list (getNombre plataforma) (getFecha plataforma) (getEncryp plataforma) (getDecryp plataforma) nuevaLista-usuarios (getLista-documentos plataforma))
+      plataforma
+      )
+  )
+         
 
 ;FUNCIONES EXTRAS
 
