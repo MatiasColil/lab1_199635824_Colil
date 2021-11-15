@@ -1,5 +1,6 @@
 #lang racket
 (require  "TDAFecha.rkt")
+(require  "TDAParadigmadocs.rkt")
 
 ;TDA Documentos
 ;TDA en el cual voy a representar los documentos que cada usuario tiene a travez de una lista
@@ -9,15 +10,15 @@
 ;[nombre del usuario, id del documento , nombre documento, lista de documentos del usuario, fecha]
 ; la lista de documentos del usuario tiene la siguiente forma:
 ;[ ( (doc1 version1) ) , ......]
-;la cual el usuario al ir modificando sus documentos sera vera asi esta lista
+;la cual el usuario al ir modificando sus documentos sera vera de esta forma la lista
 ;[ ( (doc1 version1) , (doc1 version2), ... ) ]
 
 ;Constructor
-;Funcion que me construye la lista de documentos del usuario
+;Funcion que me construye una lista documento
 ;Dom: string X lista
 
 (define (crearDoc nombreUsuario idDocumento nombreDoc texto fecha)
-  (list nombreUsuario idDocumento nombreDoc (list (list texto )) fecha)
+  (list nombreUsuario idDocumento nombreDoc (list (list texto fecha)) fecha)
   )
 
 ;Pertenencia
@@ -63,7 +64,7 @@
       )
   )
 
-;Funcion que el nombre del usuario que creo el documento
+;Funcion que me retorna el nombre del documento
 ;Dom: una lista
 ;Rec: una lista
 
@@ -77,7 +78,7 @@
 ;Dom: una lista
 ;Rec: una fecha
 
-(define (getLista-doc listaUsuario)
+(define (getLista-versiones listaUsuario)
   (if (esDoc? listaUsuario)
       (car (cdr (cdr (cdr listaUsuario))))
       #f
@@ -93,8 +94,6 @@
       )
   )
 
-
-
 ;Modificador
 ;Funcion que me modifica la lista de documentos
 ;Dom: una lista
@@ -109,12 +108,219 @@
       
 ;Funciones extras
 
+;Funcion que me agrega una lista documento a una lista de listas de documentos
+;Dom: list X list
+;Rec: list
+(define (agregarDocumento lista-documentos documento)
+  (if (and (list? documento)
+           (esDoc? documento)
+           )
+      (append lista-documentos (list documento))
+      lista-documentos
+      )
+  )
+
+;Funcion que me agrega una nueva version de un documento
+;Dom: list X string
+;Rec: list
 (define (agregarNueva-versionDoc listaVersiones nuevaVersion)
   (if (eq? (null? nuevaVersion) #f)
-      (append listaVersiones nuevaVersion)
+      (append listaVersiones (list nuevaVersion))
       listaVersiones
       )
   )
 
+;Funcion que me añade texto al final de un documento
+;Dom: string X string
+;Rec: list
+(define (nuevaTexto versionActiva contenidoAgregar fecha)
+  (list (encryptFn(string-append versionActiva " " contenidoAgregar)) fecha)
+  )
+
+;Funcion que me retorna la ultima version activa
+;Dom: list
+;Rec: string
+(define (ultimaVersion listaVersiones)
+  (car (car (reverse listaVersiones)))
+  )
+
+;Funcion que me verifica si ya existe un documento en una lista de listas de documentos
+;Dom: list X string
+;Rec: valor booleano
+(define (existeDoc? listaDocumentos usuario id)
+  (if (null? listaDocumentos)
+      #f
+      (if (and
+           (eq? (getUsuario-doc  (car listaDocumentos)) usuario)
+           (eq? (getId-doc (car listaDocumentos)) id))
+          #t
+          (existeDoc? (cdr listaDocumentos) usuario id)
+          )
+      )
+  )
+;Funcion que me genera una lista de listas de documentos actualizada
+;Dom: list X list
+;Rec: list
+;Recursion de cola
+(define (nuevaLista-doc listaDocumentos listaDoc-actualizada )
+  (if (null? listaDocumentos)
+      listaDoc-actualizada
+      (if (eq? (existeDoc? listaDoc-actualizada (getUsuario-doc (car listaDocumentos)) (getId-doc (car listaDocumentos)) ) #f)
+          (nuevaLista-doc (cdr listaDocumentos) (append listaDoc-actualizada (list (car listaDocumentos))))
+          (nuevaLista-doc (cdr listaDocumentos) listaDoc-actualizada)
+          )
+      )
+  )
+
+;Funcion que me retorna una lista de documentos de un usuario en especifico
+;Dom: list X string X integer
+;Rec: list
+(define (listaDoc-especifico listaDocumentos usuario id)
+  (if (and (eq? (getUsuario-doc (car listaDocumentos)) usuario)
+           (eq? (getId-doc (car listaDocumentos)) id)
+           )
+      (car listaDocumentos)
+      (listaDoc-especifico (cdr listaDocumentos) usuario id)
+      )
+  )
+
+;Funcion que me agrega una nueva version de un documento a la lista de documentos de un usuario en especifico
+;Dom: list X string X integer X string X list
+;Rec: list
+(define (agregarNueva-version listaDocumentos usuario id contenidoAgregar fecha)
+  (list(setLista-doc (listaDoc-especifico listaDocumentos usuario id) (agregarNueva-versionDoc (getLista-versiones (listaDoc-especifico listaDocumentos usuario id))
+                                                                                               (nuevaTexto (encryptFn(ultimaVersion (getLista-versiones (listaDoc-especifico listaDocumentos usuario id))))
+                                                                                                             contenidoAgregar
+                                                                                                             fecha
+                                                                                                             )
+                                                                                               )
+                     )
+       )
+  )
+
+;Funcion que me asigna un ID a un nuevo documento creado por un usuario
+;Dom: list X string X integer
+;Rec: integer
+(define (asignarIdDoc listaDocumentos usuario nuevoId)
+  (if (null? listaDocumentos)
+      (+ 1 nuevoId)
+      (if (eq? (getUsuario-doc (car listaDocumentos)) usuario)
+          (if (eq? (>= (getId-doc (car listaDocumentos)) nuevoId) #t)
+              (asignarIdDoc (cdr listaDocumentos) usuario (getId-doc (car listaDocumentos)))
+              (asignarIdDoc (cdr listaDocumentos) usuario nuevoId)
+              )
+          (asignarIdDoc (cdr listaDocumentos) usuario nuevoId)
+          )
+      )
+  )
+
+;Funcion que me restaura una version anterior de un documento
+;Dom: list X integer X integer
+;Rec: list
+(define (restaurarVersion listaVersiones idVersion contador)
+  (if (= idVersion contador)
+      (car listaVersiones)
+      (restaurarVersion (cdr listaVersiones) idVersion (+ contador 1))
+      )
+  )
+
+;Funcion que me agrega una version anterior de un documento a la lista de documentos de un usuario en especifico
+;Dom: list X string X integer X string X list
+;Rec: list
+
+(define (agregarVersion-anterior listaDocumentos usuario idDoc idVersion)
+  (list (setLista-doc (listaDoc-especifico listaDocumentos usuario idDoc) (agregarNueva-versionDoc (getLista-versiones (listaDoc-especifico listaDocumentos usuario idDoc))
+                                                                                                   (restaurarVersion (getLista-versiones (listaDoc-especifico listaDocumentos usuario idDoc))
+                                                                                                                     idVersion
+                                                                                                                     0
+                                                                                                                     )
+                                                                                                   )
+                      )
+        )
+  )
+
+;Funcion que me retorna un documento si la frase que se esta buscando se encuentra en dicho documento
+;Dom: list X string X list
+;Rec: list
+(define (buscarFrase listaVersiones frase acc)
+  (if (null? listaVersiones)
+      acc
+      (if (string-contains? (encryptFn (car (car listaVersiones))) frase)
+          (buscarFrase (cdr listaVersiones) frase (append acc (list (car listaVersiones))))
+          (buscarFrase (cdr listaVersiones) frase acc)
+          )
+      )
+  )
+
+;Funcion que me retorna todos los documentos, junto con sus versiones, que un usuario tiene acceso, sea de escritura o lectura
+;Dom: list X list X list X string X list
+;Rec: list
+(define (obtenerDocs listaDocumentos listaDocumentos2 listaPermisos usuario acc)
+  (if (null? listaPermisos)
+      acc
+      (if (null? listaDocumentos)
+          (cond
+            [(null? listaPermisos) acc]
+            [(eq? (car (cdr (cdr (car listaPermisos)))) #\w) (obtenerDocs listaDocumentos listaDocumentos2 (cdr listaPermisos) usuario (append acc (getLista-versiones (listaDoc-especifico listaDocumentos2
+                                                                                                                                                                                      (car (car listaPermisos))
+                                                                                                                                                                                      (car (cdr (car listaPermisos)))))))]
+            [(eq? (car (cdr (cdr (car listaPermisos)))) #\r) (obtenerDocs listaDocumentos listaDocumentos2 (cdr listaPermisos) usuario (append acc (getLista-versiones (listaDoc-especifico listaDocumentos2
+                                                                                                                                                                                      (car (car listaPermisos))
+                                                                                                                                                                                      (car (cdr (car listaPermisos)))))))]
+            [else (obtenerDocs listaDocumentos listaDocumentos2 (cdr listaPermisos) acc)]
+            )
+          (if (eq? (getUsuario-doc (car listaDocumentos)) usuario)
+              (obtenerDocs (cdr listaDocumentos) listaDocumentos2 listaPermisos usuario (append acc (getLista-versiones (car listaDocumentos))))
+              (obtenerDocs (cdr listaDocumentos) listaDocumentos2 listaPermisos usuario acc)
+              )
+          )
+      )
+  )
+
+;Funcion que me transforma todas las versiones de un documento a string
+;Dom: list X integer X string
+;Rec: string
+(define (Versiones->String listaVersiones numeroVersion stringVersiones)
+  (if (null? listaVersiones)
+      stringVersiones
+      (Versiones->String (cdr listaVersiones) (+ 1 numeroVersion) (string-append stringVersiones "\n"
+                                                             "version " (number->string numeroVersion) ": "(decryptFn(car (car listaVersiones))) "\n"
+                                                             "fecha de version: "(string-join (map number->string (car (cdr (car listaVersiones)))))
+                                                             )
+                         )
+      )
+  )
+
+;Funcion que me transforma todos los documentos de un usuario a string
+;Dom: list X string X string
+;Rec: string
+(define (Documentos->String listaDocumentos usuario stringDocs)
+  (cond
+    [(and (null? listaDocumentos)
+          (eq? stringDocs " ")) (string-append "este usuario no tiene documentos creados")]
+    [(null? listaDocumentos) stringDocs]
+    [(eq? (getUsuario-doc (car listaDocumentos)) usuario) (Documentos->String (cdr listaDocumentos)
+                                                                            usuario
+                                                                            (string-append stringDocs "\n"
+                                                                                           "Nombre de documento: " (getNombre-doc (car listaDocumentos)) "\n"
+                                                                                           "Versiones: " (Versiones->String (getLista-versiones (car listaDocumentos)) 0 " ") "\n"
+                                                                                           )
+                                                                            )
+                                                        ]
+    [else (Documentos->String (cdr listaDocumentos) usuario stringDocs)]
+    )
+  )
+
+;(define Docs ( crearDoc "user1" 1 "Doc1" (encryptFn "hola mundo!") (list 1 2 2020)))
+;(define Docs2 (list Docs))
+;(define prueba (agregarNueva-version Docs2 "user1" 1 "adios mundo!" (list 1 2 2020))
+;(define test (nuevaVersion (encryptFn(ultimaVersion (getLista-doc (listaDoc-especifico Docs2 "user1" 1)))) "adios mundo"))
+;(("user2" 1 "Doc1" (("!odnum aloH" (1 2 2020))) (1 2 2020)) ("user2" 1 "Doc2" (("!odnum soida" (1 2 2020))) (1 2 2020)))
+;(define ID (asignarIdDoc Docs2 "user1" 0))
+;(define test (obtenerDoc1 Docs Docs listaPerm "user1" (list)))
+;(define Docs (list ( crearDoc "user1" 1 "Doc1" (encryptFn "hola mundo user1!") (list 1 2 2020)) ( crearDoc "user1" 1 "Doc2" (encryptFn "hola mundo user2!") (list 1 2 2020))
+ ;                    ( crearDoc "user3" 1 "Doc3" (encryptFn "hola mundo user3!") (list 1 2 2020)) ( crearDoc "user4" 1 "Doc4" (encryptFn "hola mundo! user4") (list 1 2 2020))))
+
+;(define test (Documentos->String Docs "user5" " "))
 
 (provide (all-defined-out))
