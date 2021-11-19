@@ -7,8 +7,9 @@
 
 ;Representacion
 ;es una lista que tiene 5 elementos en el siguiente orden:
-;[nombre del usuario, id del documento , nombre documento, lista de documentos del usuario, fecha]
-; la lista de documentos del usuario tiene la siguiente forma:
+;[nombre del usuario, id del documento , nombre documento, lista de versiones del documento del usuario, fecha de creacion del documento]
+
+; la lista de versiones del documento del usuario tiene la siguiente forma:
 ;[ ( (doc1 version1) ) , ......]
 ;la cual el usuario al ir modificando sus documentos sera vera de esta forma la lista
 ;[ ( (doc1 version1) , (doc1 version2), ... ) ]
@@ -46,9 +47,9 @@
 ;Dom: una lista
 ;Rec: un entero
 
-(define (getUsuario-doc listaUsuario)
-  (if (esDoc? listaUsuario)
-      (car listaUsuario)
+(define (getUsuario-doc listaDocumento)
+  (if (esDoc? listaDocumento)
+      (car listaDocumento)
       #f
       )
   )
@@ -57,9 +58,9 @@
 ;Dom: una lista
 ;Rec: un string
 
-(define (getId-doc listaUsuario)
-  (if (esDoc? listaUsuario)
-      (car (cdr listaUsuario))
+(define (getId-doc listaDocumento)
+  (if (esDoc? listaDocumento)
+      (car (cdr listaDocumento))
       #f
       )
   )
@@ -68,9 +69,9 @@
 ;Dom: una lista
 ;Rec: una lista
 
-(define (getNombre-doc listaUsuario)
-  (if (esDoc? listaUsuario)
-      (car (cdr (cdr listaUsuario)))
+(define (getNombre-doc listaDocumento)
+  (if (esDoc? listaDocumento)
+      (car (cdr (cdr listaDocumento)))
       #f
       )
   )
@@ -78,24 +79,25 @@
 ;Dom: una lista
 ;Rec: una fecha
 
-(define (getLista-versiones listaUsuario)
-  (if (esDoc? listaUsuario)
-      (car (cdr (cdr (cdr listaUsuario))))
+(define (getLista-versiones listaDocumento)
+  (if (esDoc? listaDocumento)
+      (car (cdr (cdr (cdr listaDocumento))))
       #f
       )
   )
 
 ;Funcion que retorna la fecha de creacion del documento
 
-(define (getFecha-doc listaUsuario)
-  (if (esDoc? listaUsuario)
-      (car (cdr (cdr (cdr (cdr listaUsuario)))))
+(define (getFecha-doc listaDocumento)
+  (if (esDoc? listaDocumento)
+      (car (cdr (cdr (cdr (cdr listaDocumento)))))
       #f
       )
   )
 
 ;Modificador
-;Funcion que me modifica la lista de documentos
+
+;Funcion que me modifica la lista de versiones del documento
 ;Dom: una lista
 ;Rec: una lista
 
@@ -158,10 +160,12 @@
           )
       )
   )
-;Funcion que me genera una lista de listas de documentos actualizada
+
+;Funcion que me retorna una lista de listas de documentos actualizada
 ;Dom: list X list
 ;Rec: list
 ;Recursion de cola
+
 (define (nuevaLista-doc listaDocumentos listaDoc-actualizada )
   (if (null? listaDocumentos)
       listaDoc-actualizada
@@ -310,17 +314,5 @@
     [else (Documentos->String (cdr listaDocumentos) usuario stringDocs)]
     )
   )
-
-;(define Docs ( crearDoc "user1" 1 "Doc1" (encryptFn "hola mundo!") (list 1 2 2020)))
-;(define Docs2 (list Docs))
-;(define prueba (agregarNueva-version Docs2 "user1" 1 "adios mundo!" (list 1 2 2020))
-;(define test (nuevaVersion (encryptFn(ultimaVersion (getLista-doc (listaDoc-especifico Docs2 "user1" 1)))) "adios mundo"))
-;(("user2" 1 "Doc1" (("!odnum aloH" (1 2 2020))) (1 2 2020)) ("user2" 1 "Doc2" (("!odnum soida" (1 2 2020))) (1 2 2020)))
-;(define ID (asignarIdDoc Docs2 "user1" 0))
-;(define test (obtenerDoc1 Docs Docs listaPerm "user1" (list)))
-;(define Docs (list ( crearDoc "user1" 1 "Doc1" (encryptFn "hola mundo user1!") (list 1 2 2020)) ( crearDoc "user1" 1 "Doc2" (encryptFn "hola mundo user2!") (list 1 2 2020))
- ;                    ( crearDoc "user3" 1 "Doc3" (encryptFn "hola mundo user3!") (list 1 2 2020)) ( crearDoc "user4" 1 "Doc4" (encryptFn "hola mundo! user4") (list 1 2 2020))))
-
-;(define test (Documentos->String Docs "user5" " "))
 
 (provide (all-defined-out))
