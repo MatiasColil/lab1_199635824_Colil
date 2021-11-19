@@ -2,13 +2,10 @@
 
 (require  "TDAFecha.rkt")
 
-(define encryptFn (lambda (s) (list->string (reverse (string->list s)))))
-(define decrypFn (lambda (s) (list->string (reverse (string->list s)))))
-
 ;TDA paradigmadocs
 ;este TDA representa la plataforma de documentos colaborativos
 ;es una lista con los siguientes elementos
-;(nombre de la plataforma(string), fecha(entero) ,funcion(encrypt), funcion(decrypt), lista de usuarios, lista de documentos)
+;(nombre de la plataforma(string), fecha(entero) ,funcion(encrypt), funcion(decrypt), lista de usuarios, lista de documentos, lista de accesos a documentos compartidos)
 
 ;CONSTRUCTOR
 ;Funcion que me crea la plataforma 
@@ -18,8 +15,7 @@
 (define (crearPlataforma nombre fecha encrypFn decrypFn)
   (if (string? nombre)
       (if (esfecha? fecha)
-          (list nombre fecha encrypFn decrypFn (list) (list))
-          ;los tres ultimos elemenos de la lista corresponden a lo siguiente en este orden: lista de usuarios,  lista de documentos
+          (list nombre fecha encrypFn decrypFn (list) (list) (list))
           #f
           )
       #f
@@ -33,6 +29,7 @@
 
 (define (esPlataforma? plataforma)
   (if (and (string? (car plataforma))
+           (=(length plataforma) 7)
            (esfecha? (car (cdr plataforma)))
            )
       #t
@@ -106,6 +103,16 @@
       )
   )
 
+;Funcion que me retornar la lista de accesos
+;Dom: lista
+;Rec: lista
+(define (getLista-access plataforma)
+  (if (esPlataforma? plataforma)
+      (car (cdr (cdr (cdr (cdr(cdr (cdr plataforma)))))))
+      #f
+      )
+  )
+
 ;MODIFICADORES
 
 ;Funcion que me retorna la plataforma con una nueva lista de documentos
@@ -113,7 +120,7 @@
 ;Rec: plataforma
 (define (setLista-documentos plataforma nuevaLista-documentos)
   (if (esPlataforma? plataforma)
-      ( list (getNombre plataforma) (getFecha plataforma) (getEncryp plataforma) (getDecryp plataforma) (getLista-usuarios plataforma) nuevaLista-documentos)
+      (list (getNombre plataforma) (getFecha plataforma) (getEncryp plataforma) (getDecryp plataforma) (getLista-usuarios plataforma) nuevaLista-documentos (getLista-access plataforma))
       plataforma
       )
   )
@@ -123,16 +130,28 @@
 ;Rec: plataforma
 (define (setLista-usuarios plataforma nuevaLista-usuarios)
   (if (esPlataforma? plataforma)
-      (list (getNombre plataforma) (getFecha plataforma) (getEncryp plataforma) (getDecryp plataforma) nuevaLista-usuarios (getLista-documentos plataforma))
+      (list (getNombre plataforma) (getFecha plataforma) (getEncryp plataforma) (getDecryp plataforma) nuevaLista-usuarios (getLista-documentos plataforma)(getLista-access plataforma))
       plataforma
       )
   )
-         
 
-;FUNCIONES EXTRAS
+;Funcion que me retorna la plataforma con una nueva lista de accesos
+;Dom: plataforma x lista
+;Rec: plataforma
 
-(define (modificar-plataforma nombre fecha encrypFn decrypFn listaUsuarios listaDocs)
-  (list nombre fecha encrypFn decrypFn listaUsuarios listaDocs)
+(define (setLista-access plataforma nuevaLista-access)
+  (if (esPlataforma? plataforma)
+      (list (getNombre plataforma) (getFecha plataforma) (getEncryp plataforma) (getDecryp plataforma) (getLista-usuarios plataforma) (getLista-documentos plataforma) nuevaLista-access)
+      plataforma
+      )
   )
+
+;OTRAS FUNCIONES
+
+;Funcion que me "encripta" un texto (funcion que se encuentra en el enunciado del laboratorio)
+;Dom: string
+;Rec: list
+
+(define encryptFn (lambda (s) (list->string (reverse (string->list s)))))
 
 (provide (all-defined-out))
