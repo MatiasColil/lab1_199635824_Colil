@@ -83,7 +83,7 @@
          (crearFecha nuevoDia (getMes fecha) (getAnio fecha))
          fecha
          )
-     null
+     fecha
      )
   )
 
@@ -99,7 +99,7 @@
          (crearFecha (getDia) nuevoMes (getAnio fecha))
          fecha
          )
-     null
+     fecha
      )
   )
 
@@ -113,7 +113,7 @@
          (crearFecha (getDia fecha) (getMes fecha) nuevoAnio)
          fecha
          )
-     null
+     fecha
      )
   )
 
