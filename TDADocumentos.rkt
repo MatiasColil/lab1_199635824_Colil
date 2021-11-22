@@ -288,7 +288,7 @@
   (if (null? listaVersiones)
       stringVersiones
       (Versiones->String (cdr listaVersiones) (+ 1 numeroVersion) (string-append stringVersiones "\n"
-                                                             "version " (number->string numeroVersion) ": "(decryptFn(car (car listaVersiones))) "\n"
+                                                             "version " (number->string numeroVersion) ": "(encryptFn(car (car listaVersiones))) "\n"
                                                              "fecha de version: "(string-join (map number->string (car (cdr (car listaVersiones)))))
                                                              )
                          )
