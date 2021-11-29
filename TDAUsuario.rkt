@@ -8,7 +8,7 @@
 
 ;CONSTRUCTOR
 ;Funcion que me crea una lista de usuario
-;Dom: fecha x usuario x contraseña
+;Dom: string X string X integer X list
 ;Rec: una lista
 (define (crearLista-usuario usuario contraseña login fecha)
   (list usuario contraseña login fecha);login es valor 0 si esta deslogeado o 1 si esta logeado
@@ -173,6 +173,7 @@
 ;Funcion que me busca si existe algun usuario logeado
 ;Dom: list
 ;Rec: valor booleano
+;Se utiliza recursion natural
 (define (alguienLogeado? listaUsuarios)
   (if (null? listaUsuarios)
       #f
@@ -186,6 +187,7 @@
 ;Funcion que me retorna el nombre del usuario que esta logeado
 ;Dom: list
 ;Rec: string
+;Utiliza recursion natural
 (define (usuarioLogeado lista-usuarios)
   (if (eq? (getLogin (car lista-usuarios)) 1)
       (getUsuario (car lista-usuarios))
@@ -196,6 +198,7 @@
 ;Funcion que me retorna la lista de usuario de un usuario en especifico
 ;Dom: list X string
 ;Rec: list
+;Utiliza recursion natural
 (define (listaUser-especifico listaUsuarios usuario)
   (if (eq? (getUsuario (car listaUsuarios)) usuario)  
       (car listaUsuarios)
@@ -230,6 +233,7 @@
 ;Funcion que me retorna un string con los datos del usuario
 ;Dom: list X string
 ;Rec: string
+;Utiliza recursion natural
 (define (Usuario->String listaUsuarios usuario)
   (cond
     [(eq? (getUsuario (car listaUsuarios)) usuario) (string-append "Nombre de usuario: " (getUsuario (car listaUsuarios))"\n"

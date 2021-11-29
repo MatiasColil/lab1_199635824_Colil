@@ -12,7 +12,7 @@
 
 ;Constructor
 ;Funcion que me construye la lista de accesos
-;Dom: string
+;Dom: string X string X integer X character
 ;Rec: list
 (define (crearLista-access usuario usuarioDoc idDoc permiso)
   (list usuario (list(list usuarioDoc idDoc permiso)))
@@ -82,6 +82,7 @@
 ;Funcion que retorna la lista de accesos de un usuario en especifico
 ;Dom: lista X string
 ;Rec: lista
+;Utiliza recursion natural
 (define (listaAccesos-especifico listaAccesos usuario)
   (if (null? listaAccesos)
       #f
@@ -94,6 +95,7 @@
 ;Funcion que me verifica si existe un usuario en la lista de listas de accesos
 ;Dom: list X string
 ;Rec: valor booleano
+;Utiliza recursion natural
 (define (estaUsuario-access listaAccesos usuario)
   (if (null? listaAccesos)
       #f
@@ -107,6 +109,7 @@
 ;Funcion que retorna a que usuario le pertenece el documento basado en el Id del documento
 ;Dom: list X string
 ;Rec: string
+;Utiliza recursion natural
 (define (userPertenencia listaAccesos idDoc)
   (if (eq? (car (cdr (car listaAccesos))) idDoc)
       (car (car listaAccesos))
@@ -117,6 +120,7 @@
 ;Funcion que me verifica si un usuario tiene permiso a un documento en especifico
 ;Dom: string X string X integer X list
 ;Rec: valor booleano
+;Utiliza recursion natural
 (define (tienePermiso? usuario permiso idDoc listaAccesos)
   (if (null? listaAccesos)
       #f
@@ -135,6 +139,7 @@
 ;Funcion que me verifica si un usuario a compartido un documento
 ;Dom: list X string
 ;Rec: valor booleano
+;Utiliza recursion natural
 (define (compartido? listaCompartidos usuario)
   (if (null? listaCompartidos)
       #f
@@ -155,6 +160,7 @@
 ;Funcion que me retorna una lista que contiene las listas de los nuevos accesos
 ;Dom: list X string X integer X list X list
 ;Rec: list
+;Utiliza recursion de cola
 (define (accesosNuevos listaAccesos usuarioDoc idDoc agregarAccesos nuevosAccesos);usuarioDoc es el que se logea
   (if (null? agregarAccesos)
       nuevosAccesos
@@ -173,6 +179,7 @@
 ;Funcion que me retorna la lista actualizada de accesos
 ;Dom: list X list
 ;Rec: list
+;Utiliza recursion de cola
 (define (nuevaLista-accesos listaAccesos AccesosActualizados)
   (if (null? listaAccesos)
       AccesosActualizados
@@ -196,6 +203,7 @@
 ;Funcion que revoca todos los accesos que un usuario a dado a sus documentos a otros usuarios
 ;Dom: list X string X list
 ;Rec: list
+;Utiliza recursion de cola
 (define (accesosRevocados listaAccesos usuarioRevocar nuevaLista)
   (if (null? listaAccesos)
       nuevaLista
@@ -213,6 +221,7 @@
 ;Funcion que me transforma la lista de permisos a string
 ;Dom: list X string
 ;Rec: string
+;Utiliza recursion de cola
 (define (Compartidos->String listaPermisos stringVersiones)
   (if (null? listaPermisos)
       stringVersiones

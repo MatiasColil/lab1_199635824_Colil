@@ -9,9 +9,8 @@
 
 ;CONSTRUCTOR
 ;Funcion que me crea la plataforma 
-;Dom:
+;Dom: string X list X operation X operation
 ;Rec: una lista
-
 (define (crearPlataforma nombre fecha encrypFn decrypFn)
   (if (string? nombre)
       (if (esfecha? fecha)

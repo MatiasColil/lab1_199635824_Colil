@@ -16,10 +16,10 @@
 
 ;Constructor
 ;Funcion que me construye una lista documento
-;Dom: string X lista
-
-(define (crearDoc nombreUsuario idDocumento nombreDoc texto fecha)
-  (list nombreUsuario idDocumento nombreDoc (list (list texto fecha)) fecha)
+;Dom: string X integer X string X string X list
+;Rec: list
+(define (crearDoc nombreUsuario idDocumento nombreDocumento texto fecha)
+  (list nombreUsuario idDocumento nombreDocumento (list (list texto fecha)) fecha)
   )
 
 ;Pertenencia
@@ -149,6 +149,7 @@
 ;Funcion que me verifica si ya existe un documento en una lista de listas de documentos
 ;Dom: list X string
 ;Rec: valor booleano
+;Utiliza recursion natural
 (define (existeDoc? listaDocumentos usuario id)
   (if (null? listaDocumentos)
       #f
@@ -165,7 +166,6 @@
 ;Dom: list X list
 ;Rec: list
 ;Recursion de cola
-
 (define (nuevaLista-doc listaDocumentos listaDoc-actualizada )
   (if (null? listaDocumentos)
       listaDoc-actualizada
@@ -179,6 +179,7 @@
 ;Funcion que me retorna una lista de documentos de un usuario en especifico
 ;Dom: list X string X integer
 ;Rec: list
+;Utiliza recursion natural
 (define (listaDoc-especifico listaDocumentos usuario id)
   (if (and (eq? (getUsuario-doc (car listaDocumentos)) usuario)
            (eq? (getId-doc (car listaDocumentos)) id)
@@ -205,6 +206,7 @@
 ;Funcion que me asigna un ID a un nuevo documento creado por un usuario
 ;Dom: list X string X integer
 ;Rec: integer
+;Utiliza recursion natural
 (define (asignarIdDoc listaDocumentos usuario nuevoId)
   (if (null? listaDocumentos)
       (+ 1 nuevoId)
@@ -221,6 +223,7 @@
 ;Funcion que me restaura una version anterior de un documento
 ;Dom: list X integer X integer
 ;Rec: list
+;Utiliza recursion natural
 (define (restaurarVersion listaVersiones idVersion contador)
   (if (= idVersion contador)
       (car listaVersiones)
@@ -231,7 +234,6 @@
 ;Funcion que me agrega una version anterior de un documento a la lista de documentos de un usuario en especifico
 ;Dom: list X string X integer X string X list
 ;Rec: list
-
 (define (agregarVersion-anterior listaDocumentos usuario idDoc idVersion)
   (list (setLista-doc (listaDoc-especifico listaDocumentos usuario idDoc) (agregarNueva-versionDoc (getLista-versiones (listaDoc-especifico listaDocumentos usuario idDoc))
                                                                                                    (restaurarVersion (getLista-versiones (listaDoc-especifico listaDocumentos usuario idDoc))
@@ -246,6 +248,7 @@
 ;Funcion que me retorna un documento si la frase que se esta buscando se encuentra en dicho documento
 ;Dom: list X string X list
 ;Rec: list
+;Utiliza recursion de cola
 (define (buscarFrase listaVersiones frase acc)
   (if (null? listaVersiones)
       acc
@@ -259,6 +262,7 @@
 ;Funcion que me retorna todos los documentos, junto con sus versiones, que un usuario tiene acceso, sea de escritura o lectura
 ;Dom: list X list X list X string X list
 ;Rec: list
+;Utiliza recursion de cola
 (define (obtenerDocs listaDocumentos listaDocumentos2 listaPermisos usuario acc)
   (if (null? listaPermisos)
       acc
@@ -284,6 +288,7 @@
 ;Funcion que me transforma todas las versiones de un documento a string
 ;Dom: list X integer X string
 ;Rec: string
+;Utiliza recursion de cola
 (define (Versiones->String listaVersiones numeroVersion stringVersiones)
   (if (null? listaVersiones)
       stringVersiones
@@ -298,6 +303,7 @@
 ;Funcion que me transforma todos los documentos de un usuario a string
 ;Dom: list X string X string
 ;Rec: string
+;Utiliza recursion de cola
 (define (Documentos->String listaDocumentos usuario stringDocs)
   (cond
     [(and (null? listaDocumentos)
