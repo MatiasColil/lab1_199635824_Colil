@@ -7,7 +7,7 @@
 ;(list dia mes año)
 
 ;Constructor
-;Funcion que me construye el TDA fecha
+;Funcion que me construye una fecha
 ;Dominio: enteros
 ;Recorrido: lista
 

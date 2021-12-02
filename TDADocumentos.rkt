@@ -195,9 +195,9 @@
 (define (agregarNueva-version listaDocumentos usuario id contenidoAgregar fecha)
   (list(setLista-doc (listaDoc-especifico listaDocumentos usuario id) (agregarNueva-versionDoc (getLista-versiones (listaDoc-especifico listaDocumentos usuario id))
                                                                                                (nuevaTexto (encryptFn(ultimaVersion (getLista-versiones (listaDoc-especifico listaDocumentos usuario id))))
-                                                                                                             contenidoAgregar
-                                                                                                             fecha
-                                                                                                             )
+                                                                                                           contenidoAgregar
+                                                                                                           fecha
+                                                                                                           )
                                                                                                )
                      )
        )
@@ -245,7 +245,7 @@
         )
   )
 
-;Funcion que me retorna un documento si la frase que se esta buscando se encuentra en dicho documento
+;Funcion que me retorna un lista de documentos si la frase que se esta buscando se encuentra en dicho documento
 ;Dom: list X string X list
 ;Rec: list
 ;Utiliza recursion de cola
@@ -264,26 +264,24 @@
 ;Rec: list
 ;Utiliza recursion de cola
 (define (obtenerDocs listaDocumentos listaDocumentos2 listaPermisos usuario acc)
-  (if (null? listaPermisos)
-      acc
-      (if (null? listaDocumentos)
-          (cond
-            [(null? listaPermisos) acc]
-            [(eq? (car (cdr (cdr (car listaPermisos)))) #\w) (obtenerDocs listaDocumentos listaDocumentos2 (cdr listaPermisos) usuario (append acc (getLista-versiones (listaDoc-especifico listaDocumentos2
-                                                                                                                                                                                      (car (car listaPermisos))
-                                                                                                                                                                                      (car (cdr (car listaPermisos)))))))]
-            [(eq? (car (cdr (cdr (car listaPermisos)))) #\r) (obtenerDocs listaDocumentos listaDocumentos2 (cdr listaPermisos) usuario (append acc (getLista-versiones (listaDoc-especifico listaDocumentos2
-                                                                                                                                                                                      (car (car listaPermisos))
-                                                                                                                                                                                      (car (cdr (car listaPermisos)))))))]
-            [else (obtenerDocs listaDocumentos listaDocumentos2 (cdr listaPermisos) acc)]
-            )
-          (if (eq? (getUsuario-doc (car listaDocumentos)) usuario)
-              (obtenerDocs (cdr listaDocumentos) listaDocumentos2 listaPermisos usuario (append acc (getLista-versiones (car listaDocumentos))))
-              (obtenerDocs (cdr listaDocumentos) listaDocumentos2 listaPermisos usuario acc)
-              )
+  (if (null? listaDocumentos)
+      (cond
+        [(null? listaPermisos) acc]
+        [(eq? (car (cdr (cdr (car listaPermisos)))) #\w) (obtenerDocs listaDocumentos listaDocumentos2 (cdr listaPermisos) usuario (append acc (getLista-versiones (listaDoc-especifico listaDocumentos2
+                                                                                                                                                                                        (car (car listaPermisos))
+                                                                                                                                                                                        (car (cdr (car listaPermisos)))))))]
+        [(eq? (car (cdr (cdr (car listaPermisos)))) #\r) (obtenerDocs listaDocumentos listaDocumentos2 (cdr listaPermisos) usuario (append acc (getLista-versiones (listaDoc-especifico listaDocumentos2
+                                                                                                                                                                                        (car (car listaPermisos))
+                                                                                                                                                                                        (car (cdr (car listaPermisos)))))))]
+        [else (obtenerDocs listaDocumentos listaDocumentos2 (cdr listaPermisos) acc)]
+        )
+      (if (eq? (getUsuario-doc (car listaDocumentos)) usuario)
+          (obtenerDocs (cdr listaDocumentos) listaDocumentos2 listaPermisos usuario (append acc (getLista-versiones (car listaDocumentos))))
+          (obtenerDocs (cdr listaDocumentos) listaDocumentos2 listaPermisos usuario acc)
           )
       )
   )
+
 
 ;Funcion que me transforma todas las versiones de un documento a string
 ;Dom: list X integer X string
@@ -293,9 +291,9 @@
   (if (null? listaVersiones)
       stringVersiones
       (Versiones->String (cdr listaVersiones) (+ 1 numeroVersion) (string-append stringVersiones "\n"
-                                                             "version " (number->string numeroVersion) ": "(encryptFn(car (car listaVersiones))) "\n"
-                                                             "fecha de version: "(string-join (map number->string (car (cdr (car listaVersiones)))))
-                                                             )
+                                                                                 "version " (number->string numeroVersion) ": "(encryptFn(car (car listaVersiones))) "\n"
+                                                                                 "fecha de version: "(string-join (map number->string (car (cdr (car listaVersiones)))))
+                                                                                 )
                          )
       )
   )
@@ -310,13 +308,13 @@
           (eq? stringDocs " ")) (string-append "este usuario no tiene documentos creados")]
     [(null? listaDocumentos) stringDocs]
     [(eq? (getUsuario-doc (car listaDocumentos)) usuario) (Documentos->String (cdr listaDocumentos)
-                                                                            usuario
-                                                                            (string-append stringDocs "\n"
-                                                                                           "Nombre de documento: " (getNombre-doc (car listaDocumentos)) "\n"
-                                                                                           "Versiones: " (Versiones->String (getLista-versiones (car listaDocumentos)) 0 " ") "\n"
-                                                                                           )
-                                                                            )
-                                                        ]
+                                                                              usuario
+                                                                              (string-append stringDocs "\n"
+                                                                                             "Nombre de documento: " (getNombre-doc (car listaDocumentos)) "\n"
+                                                                                             "Versiones: " (Versiones->String (getLista-versiones (car listaDocumentos)) 0 " ") "\n"
+                                                                                             )
+                                                                              )
+                                                          ]
     [else (Documentos->String (cdr listaDocumentos) usuario stringDocs)]
     )
   )

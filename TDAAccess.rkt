@@ -85,7 +85,7 @@
 ;Utiliza recursion natural
 (define (listaAccesos-especifico listaAccesos usuario)
   (if (null? listaAccesos)
-      #f
+      (list)
       (if (eq? (getNombre-access (car listaAccesos)) usuario)
           (car listaAccesos)
           (listaAccesos-especifico (cdr listaAccesos) usuario)
